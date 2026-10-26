@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Board Game Tracker</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0; padding: 2rem 1.25rem; max-width: 28rem; margin-inline: auto; color: #1d1b20; background: #fffbfe; }
+  @media (prefers-color-scheme: dark) { body { color: #e6e0e9; background: #141218; } a.btn { color: #141218; } }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+  p { margin: .75rem 0; }
+  a.btn { display: block; text-align: center; padding: .85rem 1rem; border-radius: 1.5rem; background: #6750a4; color: #fff; text-decoration: none; font-weight: 600; margin: 1.25rem 0 .5rem; }
+  .muted { opacity: .7; font-size: .9rem; }
+  textarea { width: 100%; box-sizing: border-box; height: 5rem; font: 12px monospace; }
+  button { font: inherit; padding: .5rem 1rem; border-radius: 1rem; border: 1px solid currentColor; background: none; color: inherit; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<h1 id="title">Board Game Tracker</h1>
+<p id="what">Open this link on an Android phone with Board Game Tracker installed.</p>
+<a class="btn" id="open" href="#" hidden>Open in Board Game Tracker</a>
+<div id="fallback" hidden>
+  <p class="muted">Nothing happened? The app may not be installed. You can also copy this code, then in the app choose Add game (or Add play) and Paste from message.</p>
+  <textarea id="code" readonly></textarea>
+  <p><button id="copy" type="button">Copy code</button></p>
+</div>
+<p class="muted">The game or play travels inside the part of this link after the #. That part is read by your browser only and is never sent to a server.</p>
+<script>
+(function () {
+  var m = /^#([gp])=([A-Za-z0-9_-]{1,12000})$/.exec(location.hash);
+  if (!m) return;
+  var kind = m[1] === 'g' ? 'game' : 'play', code = m[2];
+  document.getElementById('title').textContent = m[1] === 'g' ? 'A game for your shelf' : 'A play to add';
+  document.getElementById('what').textContent = 'Tap the button to add it in Board Game Tracker. You see it first; nothing is saved until you tap Add.';
+  var scheme = 'boardgametracker://' + kind + '?d=' + code;
+  var android = /Android/i.test(navigator.userAgent);
+  var href = android
+    ? 'intent://' + kind + '?d=' + code + '#Intent;scheme=boardgametracker;package=com.boardgametracker;end'
+    : scheme;
+  var open = document.getElementById('open');
+  open.href = href; open.hidden = false;
+  document.getElementById('code').value = location.href;
+  document.getElementById('fallback').hidden = false;
+  document.getElementById('copy').onclick = function () {
+    var t = document.getElementById('code'); t.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.resolve(document.execCommand('copy'))).then(function () { document.getElementById('copy').textContent = 'Copied'; });
+  };
+  if (android) location.replace(href);
+})();
+</script>
+</body>
+</html>
