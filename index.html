@@ -23,18 +23,24 @@
 <p id="what">Open this link on an Android phone with Board Game Tracker installed.</p>
 <a class="btn" id="open" href="#" hidden>Open in Board Game Tracker</a>
 <div id="fallback" hidden>
-  <p class="muted">Nothing happened? The app may not be installed. You can also copy this code, then in the app choose Add game (or Add play) and Paste from message.</p>
+  <p class="muted">Nothing happened? The app may not be installed. You can also copy this link, then in the app use Paste from message (on Add game or the Plays page).</p>
   <textarea id="code" readonly></textarea>
   <p><button id="copy" type="button">Copy code</button></p>
 </div>
-<p class="muted">The game or play travels inside the part of this link after the #. That part is read by your browser only and is never sent to a server.</p>
+<p class="muted">What is shared travels inside the part of this link after the #. That part is read by your browser only and is never sent to a server.</p>
 <script>
 (function () {
-  var m = /^#([gp])=([A-Za-z0-9_-]{1,12000})$/.exec(location.hash);
+  var m = /^#([gpfi])=([A-Za-z0-9_-]{1,12000})$/.exec(location.hash);
   if (!m) return;
-  var kind = m[1] === 'g' ? 'game' : 'play', code = m[2];
-  document.getElementById('title').textContent = m[1] === 'g' ? 'A game for your shelf' : 'A play to add';
-  document.getElementById('what').textContent = 'Tap the button to add it in Board Game Tracker. You see it first; nothing is saved until you tap Add.';
+  var KINDS = {
+    g: { host: 'game', title: 'A game for your shelf', what: 'Tap the button to add it in Board Game Tracker. You see it first; nothing is saved until you tap Add.' },
+    p: { host: 'play', title: 'A play to add', what: 'Tap the button to add it in Board Game Tracker. You see it first; nothing is saved until you tap Add.' },
+    f: { host: 'follow', title: 'A shelf to follow', what: 'Tap the button to open Board Game Tracker. You are asked before you follow anyone.' },
+    i: { host: 'group', title: 'A group to join', what: 'Tap the button to open Board Game Tracker. You are asked before you join, and you choose which player is you.' }
+  };
+  var info = KINDS[m[1]], kind = info.host, code = m[2];
+  document.getElementById('title').textContent = info.title;
+  document.getElementById('what').textContent = info.what;
   var scheme = 'boardgametracker://' + kind + '?d=' + code;
   var android = /Android/i.test(navigator.userAgent);
   var href = android
